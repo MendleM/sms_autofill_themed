@@ -32,7 +32,8 @@ class SmsAutoFill {
   }
 
   Future<void> listenForCode({String smsCodeRegexPattern = '\\d{4,6}'}) async {
-    await _channel.invokeMethod('listenForCode', <String, String>{'smsCodeRegexPattern': smsCodeRegexPattern});
+    await _channel.invokeMethod(
+        'listenForCode', <String, String>{'smsCodeRegexPattern': smsCodeRegexPattern});
   }
 
   Future<void> unregisterListener() async {
@@ -60,12 +61,14 @@ class PinFieldAutoFill extends StatefulWidget {
   final bool enableInteractiveSelection, enabled;
   final String? smsCodeRegexPattern;
   final List<TextInputFormatter>? inputFormatters;
+  final Function<Widget>(PinInputTextField)? wrappingWidget;
 
   const PinFieldAutoFill(
       {Key? key,
       this.keyboardType = const TextInputType.numberWithOptions(),
       this.textInputAction = TextInputAction.done,
       this.focusNode,
+      this.wrappingWidget,
       this.cursor,
       this.inputFormatters,
       this.enableInteractiveSelection = true,
@@ -92,11 +95,14 @@ class _PinFieldAutoFillState extends State<PinFieldAutoFill> with CodeAutoFill {
 
   @override
   Widget build(BuildContext context) {
-    return PinInputTextField(
+    final textField = PinInputTextField(
       enabled: widget.enabled,
       pinLength: widget.codeLength,
       decoration: widget.decoration ??
-          UnderlineDecoration(colorBuilder: FixedColorBuilder(Colors.black), textStyle: TextStyle(color: Colors.black)),
+          UnderlineDecoration(
+            colorBuilder: FixedColorBuilder(Colors.black),
+            textStyle: TextStyle(color: Colors.black),
+          ),
       focusNode: widget.focusNode,
       enableInteractiveSelection: widget.enableInteractiveSelection,
       autocorrect: false,
@@ -111,6 +117,12 @@ class _PinFieldAutoFillState extends State<PinFieldAutoFill> with CodeAutoFill {
       textInputAction: widget.textInputAction,
       onSubmit: widget.onCodeSubmitted,
     );
+
+    if (widget.wrappingWidget != null) {
+      return widget.wrappingWidget!(textField);
+    }
+
+    return textField;
   }
 
   @override
@@ -320,8 +332,11 @@ class _PhoneFieldHintState extends State<_PhoneFieldHint> {
     super.dispose();
   }
 
-  Widget _createField(bool isFormWidget, InputDecoration decoration, FormFieldValidator? validator) {
-    return isFormWidget ? _createTextFormField(decoration, validator) : _createTextField(decoration);
+  Widget _createField(
+      bool isFormWidget, InputDecoration decoration, FormFieldValidator? validator) {
+    return isFormWidget
+        ? _createTextFormField(decoration, validator)
+        : _createTextField(decoration);
   }
 
   Widget _createTextField(InputDecoration decoration) {
