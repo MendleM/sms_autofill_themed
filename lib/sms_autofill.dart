@@ -61,7 +61,7 @@ class PinFieldAutoFill extends StatefulWidget {
   final bool enableInteractiveSelection, enabled;
   final String? smsCodeRegexPattern;
   final List<TextInputFormatter>? inputFormatters;
-  final Function<Widget>(PinInputTextField)? wrappingWidget;
+  final Widget Function(PinInputTextField)? wrappingWidget;
 
   const PinFieldAutoFill(
       {Key? key,
